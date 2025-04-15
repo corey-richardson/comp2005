@@ -32,14 +32,6 @@ public class PatientController
         return Collections.emptyList();
     }
 
-    // F3 Endpoint
-    // TODO: MOVE THIS TO ADMISSIONS CONTROLLER / SERVICE
-    @GetMapping("/month-with-most")
-    public String getMonthWithMost() {
-        // TODO
-        return "";
-    }
-
     // F4 Endpoint
     @GetMapping("/multiple-staff")
     public List<Patient> getMultipleStaff() {
