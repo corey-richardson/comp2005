@@ -1,5 +1,6 @@
 package com.example.comp2005_api;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -8,7 +9,9 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class ApiHelper
 {
+    @Autowired
     private final RestTemplate restTemplate;
+
     private final String baseUrl = "https://web.socem.plymouth.ac.uk/COMP2005/api/";
 
     public ApiHelper(RestTemplate restTemplate) {
