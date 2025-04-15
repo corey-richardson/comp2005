@@ -2,10 +2,10 @@ package com.example.comp2005_api;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 class ApiHelperTest
 {
 
-    @Mock
+    @MockitoBean
     private RestTemplate restTemplate;
 
     @Autowired
@@ -64,6 +64,7 @@ class ApiHelperTest
         // Act
         Patient[] patients = apiHelper.getAllPatients();
         // Assert
+        assertNotNull(patients);
         assertEquals(2, patients.length);
         assertEquals("Viv", patients[0].getFirstName());
         assertEquals("Heather", patients[1].getFirstName());
@@ -88,5 +89,4 @@ class ApiHelperTest
         Patient patient = apiHelper.getPatientById(999);
         assertNull(patient, "Patient should be null when the ID does not exist.");
     }
-    // Currently returns NO BODY, not graceful!
 }

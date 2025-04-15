@@ -8,58 +8,17 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class ApiHelper
 {
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final String baseUrl = "https://web.socem.plymouth.ac.uk/COMP2005/api/";
 
-    public Admission[] getAllAdmissions() {
-        String url = baseUrl + "Admissions";
-        return restTemplate.getForObject(url, Admission[].class);
+    public ApiHelper(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    public Admission getAdmissionById(int id) {
-        String url = baseUrl + "Admissions/" + id;
-        return restTemplate.getForObject(url, Admission.class);
-    }
-
-
-    public Allocation[] getAllAllocations() {
-        String url = baseUrl + "Allocations";
-        return restTemplate.getForObject(url, Allocation[].class);
-    }
-
-    public Allocation getAllocationById(int id) {
-        String url = baseUrl + "Allocations/" + id;
-        return restTemplate.getForObject(url, Allocation.class);
-    }
-
-
-    public Employee[] getAllEmployees() {
-        String url = baseUrl + "Employees/";
-        return restTemplate.getForObject(url, Employee[].class);
-    }
-
-    public Employee getEmployeeById(int id) {
-        String url = baseUrl + "Employees/" + id;
-        return restTemplate.getForObject(url, Employee.class);
-    }
-
-
-    public Patient[] getAllPatients() {
-        String url = baseUrl + "Patients";
+    // https://stackoverflow.com/questions/450807/how-do-i-make-the-method-return-type-generic
+    private <T> T handleRequest(String url, Class<T> responseType) {
         try {
-            return restTemplate.getForObject(url, Patient[].class);
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return new Patient[0];
-            }
-            throw e;
-        }
-    }
-
-    public Patient getPatientById(int id) {
-        String url = baseUrl + "Patients/" + id;
-        try {
-            return restTemplate.getForObject(url, Patient.class);
+            return restTemplate.getForObject(url, responseType);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return null;
@@ -67,7 +26,46 @@ public class ApiHelper
             throw e;
         }
     }
-}
 
-// Add Try-Catch logic
-// Handle 404s
+    public Admission[] getAllAdmissions() {
+        String url = baseUrl + "Admissions";
+        return handleRequest(url, Admission[].class);
+    }
+
+    public Admission getAdmissionById(int id) {
+        String url = baseUrl + "Admissions/" + id;
+        return handleRequest(url, Admission.class);
+    }
+
+
+    public Allocation[] getAllAllocations() {
+        String url = baseUrl + "Allocations";
+        return handleRequest(url, Allocation[].class);
+    }
+
+    public Allocation getAllocationById(int id) {
+        String url = baseUrl + "Allocations/" + id;
+        return handleRequest(url, Allocation.class);
+    }
+
+    public Employee[] getAllEmployees() {
+        String url = baseUrl + "Employees";
+        return handleRequest(url, Employee[].class);
+    }
+
+    public Employee getEmployeeById(int id) {
+        String url = baseUrl + "Employees/" + id;
+        return handleRequest(url, Employee.class);
+    }
+
+
+    public Patient[] getAllPatients() {
+        String url = baseUrl + "Patients";
+        return handleRequest(url, Patient[].class);
+    }
+
+    public Patient getPatientById(int id) {
+        String url = baseUrl + "Patients/" + id;
+        return handleRequest(url, Patient.class);
+    }
+}
