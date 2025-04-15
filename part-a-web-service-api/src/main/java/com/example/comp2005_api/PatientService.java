@@ -30,4 +30,8 @@ public class PatientService
                 .collect(Collectors.toList());
     }
 
+    // F2: A list of patients who were re-admitted withing 7 days of being discharged.
+    // F3: Identify which month has the most admissions.
+    // F4: A list of patients who have had more than one member of staff.
+
 }

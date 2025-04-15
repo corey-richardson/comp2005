@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -22,5 +23,27 @@ public class PatientController
     @GetMapping("/never-admitted")
     public List<Patient> getNeverAdmitted() {
         return service.getPatientsNeverAdmitted();
+    }
+
+    // F2 Endpoint
+    @GetMapping("/readmitted-within-7-days")
+    public List<Patient> getReadmittedSevenDays() {
+        // TODO
+        return Collections.emptyList();
+    }
+
+    // F3 Endpoint
+    // TODO: MOVE THIS TO ADMISSIONS CONTROLLER / SERVICE
+    @GetMapping("/month-with-most")
+    public String getMonthWithMost() {
+        // TODO
+        return "";
+    }
+
+    // F4 Endpoint
+    @GetMapping("/multiple-staff")
+    public List<Patient> getMultipleStaff() {
+        // TODO
+        return Collections.emptyList();
     }
 }
