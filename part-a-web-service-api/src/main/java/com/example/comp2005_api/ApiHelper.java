@@ -1,7 +1,9 @@
 package com.example.comp2005_api;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+@Component
 public class ApiHelper
 {
     private final RestTemplate restTemplate = new RestTemplate();
