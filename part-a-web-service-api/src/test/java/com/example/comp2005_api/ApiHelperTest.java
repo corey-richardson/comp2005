@@ -43,6 +43,7 @@ class ApiHelperTest
         p2.setNhsNumber("2224446666");
 
         mockPatients = new Patient[]{p1, p2};
+        mockPatient = p1;
 
         Admission a1 = new Admission();
         a1.setId(1);
