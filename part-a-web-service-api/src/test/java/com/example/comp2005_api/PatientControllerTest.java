@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,5 +53,20 @@ class PatientControllerTest
         assertEquals(2, patients.size());
         assertEquals("Viv", patients.get(0).getFirstName());
         assertEquals("Heather", patients.get(1).getFirstName());
+    }
+
+    @Test
+    void getNeverAdmitted_returnEmptyListWhenNoPatientsInCriteria() {
+        when(patientService.getPatientsNeverAdmitted()).thenReturn(Collections.emptyList());
+        List<Patient> result = patientController.getNeverAdmitted();
+        assertTrue(result.isEmpty(), "Expected empty list of Patients.");
+    }
+
+    @Test
+    void getNeverAdmitted_handleErrorsGracefully() {
+        when(patientService.getPatientsNeverAdmitted()).thenThrow(new RuntimeException("Mock Error"));
+        assertThrows(RuntimeException.class, () -> {
+           patientController.getNeverAdmitted();
+        });
     }
 }
