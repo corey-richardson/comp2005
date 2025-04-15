@@ -3,6 +3,7 @@ package com.example.comp2005_api;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +32,14 @@ public class PatientService
     }
 
     // F2: A list of patients who were re-admitted withing 7 days of being discharged.
-    // F4: A list of patients who have had more than one member of staff.
+    public List<Patient> getPatientsReadmittedSevenDays() {
+        // TODO
+        return Collections.emptyList();
+    }
 
+    // F4: A list of patients who have had more than one member of staff.
+    public List<Patient> getPatientsMultipleStaff() {
+        // TODO
+        return Collections.emptyList();
+    }
 }
