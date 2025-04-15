@@ -1,6 +1,8 @@
 package com.example.comp2005_api;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -44,12 +46,26 @@ public class ApiHelper
 
     public Patient[] getAllPatients() {
         String url = baseUrl + "Patients";
-        return restTemplate.getForObject(url, Patient[].class);
+        try {
+            return restTemplate.getForObject(url, Patient[].class);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return new Patient[0];
+            }
+            throw e;
+        }
     }
 
     public Patient getPatientById(int id) {
         String url = baseUrl + "Patients/" + id;
-        return restTemplate.getForObject(url, Patient.class);
+        try {
+            return restTemplate.getForObject(url, Patient.class);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return null;
+            }
+            throw e;
+        }
     }
 }
 
