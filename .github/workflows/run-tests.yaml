@@ -19,6 +19,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      
+      - name: Make gradlew executable
+        run: chmod +x ./part-a-web-service-api/gradlew
 
-      - name: Build and run tests with Gradle
+      - name: Run tests with Gradle
         run: ./gradlew clean test
+        working-directory: ./part-a-web-service-api
