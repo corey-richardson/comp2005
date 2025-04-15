@@ -2,7 +2,7 @@ package com.example.comp2005_api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Person
+public abstract class Person
 {
     private int id;
 
