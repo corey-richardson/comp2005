@@ -10,15 +10,26 @@ public class Admission
     private String admissionDate;
     private String dischargeDate;
 
+    public Admission() {
+        // No argument constructor
+    }
+
+    public Admission(int id, int patientID, String admissionDate, String dischargeDate) {
+        this.id = id;
+        this.patientID = patientID;
+        this.admissionDate = admissionDate;
+        this.dischargeDate = dischargeDate;
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
     public int getPatientID() { return patientID; }
     public void setPatientID(int patientID) { this.patientID = patientID; }
 
-    public String getAdmissionDate() { return admissionDate; };
+    public String getAdmissionDate() { return admissionDate; }
     public void setAdmissionDate(String admissionDate) { this.admissionDate = admissionDate; }
 
-    public String getDischargeDate() { return dischargeDate; };
+    public String getDischargeDate() { return dischargeDate; }
     public void setDischargeDate(String dischargeDate) { this.dischargeDate = dischargeDate; }
 }

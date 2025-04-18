@@ -8,6 +8,18 @@ public class Allocation
     private String startTime;
     private String endTime;
 
+    public Allocation() {
+        // No argument constructor
+    }
+
+    public Allocation(int id, int admissionId, int employeeId, String startTime, String endTime) {
+        this.id = id;
+        this.admissionId = admissionId;
+        this.employeeId = employeeId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
