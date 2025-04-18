@@ -4,8 +4,10 @@ package com.example.comp2005_api;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,14 +19,16 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class PatientControllerTest
 {
-    @MockitoBean
+    @Mock
     private PatientService patientService;
 
+    @InjectMocks
     private PatientController patientController;
+
     private List<Patient> mockPatients;
 
     @BeforeEach
-    void setUp() {
+    void setUpBase() {
         patientController = new PatientController(patientService);
 
         Patient p1 = new Patient(); p1.setId(1); p1.setFirstName("Viv");
@@ -33,33 +37,85 @@ class PatientControllerTest
         mockPatients = Arrays.asList(p1, p2);
     }
 
-    @Test
-    void getNeverAdmitted_returnsExpectedPatients() {
-        when(patientService.getPatientsNeverAdmitted()).thenReturn(mockPatients);
+    @Nested
+    class NeverAdmittedTests {
 
-        List<Patient> result = patientController.getNeverAdmitted();
+        @Test
+        void returnsExpectedPatients() {
+            when(patientService.getPatientsNeverAdmitted()).thenReturn(mockPatients);
 
-        assertEquals(2, result.size());
-        assertEquals("Viv", result.get(0).getFirstName());
-        assertEquals("Heather", result.get(1).getFirstName());
+            List<Patient> result = patientController.getNeverAdmitted();
+
+            assertEquals(2, result.size());
+            assertEquals("Viv", result.get(0).getFirstName());
+            assertEquals("Heather", result.get(1).getFirstName());
+        }
+
+        @Test
+        void returnsEmptyListWhenNoPatients() {
+            when(patientService.getPatientsNeverAdmitted()).thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientController.getNeverAdmitted();
+
+            assertNotNull(result);
+            assertTrue(result.isEmpty(), "Expected empty list of Patients.");
+        }
+
+        @Test
+        void handleServiceFailure() {
+            // when(patientService.getPatientsNeverAdmitted()).thenThrow(new RuntimeException("Mock Service Error"));
+            // When the patientService fails, it returns an emptyList
+            when(patientService.getPatientsNeverAdmitted()).thenReturn(Collections.emptyList());
+            List<Patient> patients = patientController.getNeverAdmitted();
+            assertTrue(patients.isEmpty());
+        }
     }
 
-    @Test
-    void getNeverAdmitted_returnsEmptyListWhenNoMatch() {
-        when(patientService.getPatientsNeverAdmitted()).thenReturn(Collections.emptyList());
+    @Nested
+    class ReadmittedWithinSevenDaysTests {
 
-        List<Patient> result = patientController.getNeverAdmitted();
+        private List<Admission> mockAdmissions;
 
-        assertNotNull(result);
-        assertTrue(result.isEmpty(), "Expected empty list of Patients.");
-    }
+        @BeforeEach
+        void setUpSevenDays() {
+            // Mock admission data
+            Admission a1 = new Admission(); a1.setPatientID(1); a1.setAdmissionDate("2023-01-01T10:00:00"); a1.setDischargeDate("2023-01-02T10:00:00");
+            Admission a2 = new Admission(); a2.setPatientID(1); a2.setAdmissionDate("2023-01-05T12:00:00"); a2.setDischargeDate("2023-01-06T12:00:00");
+            Admission a3 = new Admission(); a3.setPatientID(2); a3.setAdmissionDate("2023-01-01T14:00:00"); a3.setDischargeDate("2023-01-02T14:00:00");
+            Admission a4 = new Admission(); a4.setPatientID(2); a4.setAdmissionDate("2023-01-10T18:00:00"); a4.setDischargeDate("2023-01-11T18:00:00");
 
-    @Test
-    void getNeverAdmitted_handleServiceFailure() {
-        // when(patientService.getPatientsNeverAdmitted()).thenThrow(new RuntimeException("Mock Service Error"));
-        // When the patientService fails, it returns an emptyList
-        when(patientService.getPatientsNeverAdmitted()).thenReturn(Collections.emptyList());
-        List<Patient> patients = patientController.getNeverAdmitted();
-        assertTrue(patients.isEmpty());
+            mockAdmissions = Arrays.asList(a1, a2, a3, a4);
+        }
+
+        @Test
+        void returnsExpected() {
+            when(patientService.getPatientsReadmittedSevenDays()).thenReturn(mockPatients);
+            List<Patient> result = patientController.getReadmittedSevenDays();
+
+            assertEquals(2, result.size()); // Doesn't test the service logic, just tests that mockPatients gets
+                                                     // passed through the different layers correctly
+                                                     // Logic testing is handled in the PatientServiceTest file
+            assertEquals("Viv", result.get(0).getFirstName());
+            assertEquals("Heather", result.get(1).getFirstName());
+        }
+
+        @Test
+        void returnsEmptyListWhenNoPatients() {
+            when(patientService.getPatientsReadmittedSevenDays()).thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientController.getReadmittedSevenDays();
+
+            assertNotNull(result);
+            assertTrue(result.isEmpty(), "Expected empty list of Patients.");
+        }
+
+        @Test
+        void handleServiceFailure() {
+            // when(patientService.getPatientsNeverAdmitted()).thenThrow(new RuntimeException("Mock Service Error"));
+            // When the patientService fails, it returns an emptyList
+            when(patientService.getPatientsReadmittedSevenDays()).thenReturn(Collections.emptyList());
+            List<Patient> patients = patientController.getReadmittedSevenDays();
+            assertTrue(patients.isEmpty());
+        }
     }
 }
