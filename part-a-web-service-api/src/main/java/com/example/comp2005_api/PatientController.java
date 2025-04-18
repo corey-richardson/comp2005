@@ -28,8 +28,7 @@ public class PatientController
     // F2 Endpoint
     @GetMapping("/readmitted-within-7-days")
     public List<Patient> getReadmittedSevenDays() {
-        // TODO
-        return Collections.emptyList();
+        return service.getPatientsReadmittedSevenDays();
     }
 
     // F4 Endpoint
