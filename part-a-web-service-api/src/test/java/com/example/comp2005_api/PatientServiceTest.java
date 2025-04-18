@@ -92,10 +92,23 @@ class PatientServiceTest
 
         @BeforeEach
         void setUpAdmissions() {
-            Admission a1 = new Admission(); a1.setPatientID(1); a1.setDischargeDate("2023-01-01");
-            Admission a2 = new Admission(); a2.setPatientID(1); a2.setAdmissionDate("2023-01-05");
-            Admission a3 = new Admission(); a3.setPatientID(2); a3.setDischargeDate("2023-01-01");
-            Admission a4 = new Admission(); a4.setPatientID(2); a4.setAdmissionDate("2023-01-20");
+            Admission a1 = new Admission();
+            a1.setPatientID(1);
+            a1.setAdmissionDate("2023-01-01T10:00:00");
+            a1.setDischargeDate("2023-01-01T11:30:27");
+
+            Admission a2 = new Admission();
+            a2.setPatientID(1);
+            a2.setAdmissionDate("2023-01-05T12:20:12");
+
+            Admission a3 = new Admission();
+            a3.setPatientID(2);
+            a3.setAdmissionDate("2023-01-01T13:45:10");
+            a3.setDischargeDate("2023-01-01T13:45:10");
+
+            Admission a4 = new Admission();
+            a4.setPatientID(2);
+            a4.setAdmissionDate("2023-01-20T17:38:00");
 
             mockAdmissions = new Admission[] { a1, a2, a3, a4 };
         }
