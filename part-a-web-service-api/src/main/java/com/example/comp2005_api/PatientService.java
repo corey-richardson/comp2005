@@ -64,9 +64,6 @@ public class PatientService
                     LocalDateTime discharge = LocalDateTime.parse(previous.getDischargeDate());
                     LocalDateTime nextAdmit = LocalDateTime.parse(current.getAdmissionDate());
 
-                    System.out.println("Discharge Date: " + discharge);
-                    System.out.println("Next Admission Date: " + nextAdmit);
-
                     if (!nextAdmit.isBefore(discharge) && !nextAdmit.isAfter(discharge.plusDays(7))) {
                         readmittedIds.add(p.getId());
                         break;
