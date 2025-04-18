@@ -89,6 +89,8 @@ class PatientServiceTest
     @Nested
     class ReadmittedWithinSevenDaysTests {
         private Admission[] mockAdmissions;
+        private Admission[] mockAdmissionsOnlyGT7Days;
+
 
         @BeforeEach
         void setUpAdmissions() {
@@ -111,6 +113,7 @@ class PatientServiceTest
             a4.setAdmissionDate("2023-01-20T17:38:00");
 
             mockAdmissions = new Admission[] { a1, a2, a3, a4 };
+            mockAdmissionsOnlyGT7Days = new Admission[] { a3, a4 };
         }
 
         @Test
@@ -126,6 +129,8 @@ class PatientServiceTest
         @Test
         void returnsEmptyWhenNoPatients() {
             mockAdmissions = Arrays.copyOfRange(mockAdmissions, 2, mockAdmissions.length); // a3 and a4 only, >7 days
+            when(apiHelper.getAllPatients()).thenReturn(mockPatients);
+            when(apiHelper.getAllAdmissions()).thenReturn(mockAdmissions);
             List<Patient> patients = service.getPatientsReadmittedSevenDays();
             assertNotNull(patients);
             assert(patients.isEmpty());
