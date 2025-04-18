@@ -135,5 +135,14 @@ class PatientServiceTest
             assertNotNull(patients);
             assert(patients.isEmpty());
         }
+
+        @Test
+        void handlesErrorsGracefully() {
+            when(apiHelper.getAllPatients()).thenThrow(new RuntimeException("Mock Error"));
+            when(apiHelper.getAllAdmissions()).thenThrow(new RuntimeException("Mock Error"));
+
+            List<Patient> result = service.getPatientsReadmittedSevenDays();
+            assertTrue(result.isEmpty());
+        }
     }
 }
