@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -82,6 +83,39 @@ class PatientServiceTest
 
             List<Patient> result = service.getPatientsNeverAdmitted();
             assertTrue(result.isEmpty());
+        }
+    }
+
+    @Nested
+    class ReadmittedWithinSevenDaysTests {
+        private Admission[] mockAdmissions;
+
+        @BeforeEach
+        void setUpAdmissions() {
+            Admission a1 = new Admission(); a1.setPatientID(1); a1.setDischargeDate("2023-01-01");
+            Admission a2 = new Admission(); a2.setPatientID(1); a2.setAdmissionDate("2023-01-05");
+            Admission a3 = new Admission(); a3.setPatientID(2); a3.setDischargeDate("2023-01-01");
+            Admission a4 = new Admission(); a4.setPatientID(2); a4.setAdmissionDate("2023-01-20");
+
+            mockAdmissions = new Admission[] { a1, a2, a3, a4 };
+        }
+
+        @Test
+        void returnsExpected() {
+            when(apiHelper.getAllPatients()).thenReturn(mockPatients);
+            when(apiHelper.getAllAdmissions()).thenReturn(mockAdmissions);
+            List<Patient> patients = service.getPatientsReadmittedSevenDays();
+            assertNotNull(patients);
+            assertEquals(1, patients.size());
+            assertEquals(1, patients.get(0).getId());
+        }
+
+        @Test
+        void returnsEmptyWhenNoPatients() {
+            mockAdmissions = Arrays.copyOfRange(mockAdmissions, 2, mockAdmissions.length); // a3 and a4 only, >7 days
+            List<Patient> patients = service.getPatientsReadmittedSevenDays();
+            assertNotNull(patients);
+            assert(patients.isEmpty());
         }
     }
 }
