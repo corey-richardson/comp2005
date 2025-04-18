@@ -37,53 +37,57 @@ public class PatientService
 
     // F2: A list of patients who were re-admitted withing 7 days of being discharged.
     public List<Patient> getPatientsReadmittedSevenDays() {
-        Patient[] patients = apiHelper.getAllPatients();
-        Admission[] admissions = apiHelper.getAllAdmissions();
+        try {
+            Patient[] patients = apiHelper.getAllPatients();
+            Admission[] admissions = apiHelper.getAllAdmissions();
 
-        Set<Integer> readmittedIds = new HashSet<>();
+            Set<Integer> readmittedIds = new HashSet<>();
 
-        for (Patient p : patients) {
-            // Get all admissions for a patient
-            List<Admission> admissionsByPatient = new ArrayList<>();
+            for (Patient p : patients) {
+                // Get all admissions for a patient
+                List<Admission> admissionsByPatient = new ArrayList<>();
 
-            for (Admission a : admissions) {
-                if (a.getPatientID() == p.getId()) {
-                    admissionsByPatient.add(a);
+                for (Admission a : admissions) {
+                    if (a.getPatientID() == p.getId()) {
+                        admissionsByPatient.add(a);
+                    }
                 }
-            }
-            // Sort by admission date
-            // https://www.w3schools.com/java/ref_arraylist_sort.asp
-            admissionsByPatient.sort(Comparator.comparing(a -> LocalDateTime.parse(a.getAdmissionDate())));
+                // Sort by admission date
+                // https://www.w3schools.com/java/ref_arraylist_sort.asp
+                admissionsByPatient.sort(Comparator.comparing(a -> LocalDateTime.parse(a.getAdmissionDate())));
 
-            // Check for readmission within 7 days
-            for (int i = 1; i < admissionsByPatient.size(); i++) {
-                Admission previous = admissionsByPatient.get(i-1);
-                Admission current = admissionsByPatient.get(i);
+                // Check for readmission within 7 days
+                for (int i = 1; i < admissionsByPatient.size(); i++) {
+                    Admission previous = admissionsByPatient.get(i-1);
+                    Admission current = admissionsByPatient.get(i);
 
-                if (previous.getDischargeDate() != null) {
-                    LocalDateTime discharge = LocalDateTime.parse(previous.getDischargeDate());
-                    LocalDateTime nextAdmit = LocalDateTime.parse(current.getAdmissionDate());
+                    if (previous.getDischargeDate() != null) {
+                        LocalDateTime discharge = LocalDateTime.parse(previous.getDischargeDate());
+                        LocalDateTime nextAdmit = LocalDateTime.parse(current.getAdmissionDate());
 
-                    if (!nextAdmit.isBefore(discharge) && !nextAdmit.isAfter(discharge.plusDays(7))) {
+                        if (!nextAdmit.isBefore(discharge) && !nextAdmit.isAfter(discharge.plusDays(7))) {
+                            readmittedIds.add(p.getId());
+                            break;
+                        }
+                    } else if (current.getAdmissionDate() != null) { // Patient is currently admitted
+                        LocalDateTime nextAdmit = LocalDateTime.parse(current.getAdmissionDate());
                         readmittedIds.add(p.getId());
                         break;
                     }
-                } else if (current.getAdmissionDate() != null) { // Patient is currently admitted
-                    LocalDateTime nextAdmit = LocalDateTime.parse(current.getAdmissionDate());
-                    readmittedIds.add(p.getId());
-                    break;
                 }
             }
-        }
 
-        List<Patient> readmitted_patients = new ArrayList<>();
-        for (Patient p : patients) {
-            if (readmittedIds.contains(p.getId())) {
-                readmitted_patients.add(p);
+            List<Patient> readmitted_patients = new ArrayList<>();
+            for (Patient p : patients) {
+                if (readmittedIds.contains(p.getId())) {
+                    readmitted_patients.add(p);
+                }
             }
-        }
 
-        return readmitted_patients;
+            return readmitted_patients;
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     // F4: A list of patients who have had more than one member of staff.
