@@ -204,7 +204,7 @@ class PatientServiceTest
             when(apiHelper.getAllAllocations()).thenThrow(new RuntimeException("Mock Error"));
 
             List<Patient> result = service.getPatientsReadmittedSevenDays();
-            
+
             assertNotNull(result);
             assertTrue(result.isEmpty());
         }
