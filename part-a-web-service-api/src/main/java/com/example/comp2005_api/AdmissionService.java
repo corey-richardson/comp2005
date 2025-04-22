@@ -12,5 +12,9 @@ public class AdmissionService
     }
 
     // F3: Identify which month has the most admissions.
-    // TODO
+    public String getMonthWithMostAdmissions() {
+        // TODO
+
+        return "NOT IMPLEMENTED";
+    }
 }
