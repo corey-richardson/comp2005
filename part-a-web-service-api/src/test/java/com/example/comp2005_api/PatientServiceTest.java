@@ -82,6 +82,7 @@ class PatientServiceTest
             when(apiHelper.getAllAdmissions()).thenReturn(mockAdmissions);
 
             List<Patient> result = service.getPatientsNeverAdmitted();
+            assertNotNull(result);
             assertTrue(result.isEmpty());
         }
     }
@@ -142,6 +143,69 @@ class PatientServiceTest
             when(apiHelper.getAllAdmissions()).thenThrow(new RuntimeException("Mock Error"));
 
             List<Patient> result = service.getPatientsReadmittedSevenDays();
+            assertNotNull(result);
+            assertTrue(result.isEmpty());
+        }
+    }
+
+    @Nested
+    class MultipleStaffTests {
+
+        private Admission[] mockAdmissions;
+        private Allocation[] mockAllocations;
+
+        @BeforeEach
+        void setUp() {
+
+            Admission a1 = new Admission(); a1.setId(1); a1.setPatientID(1);
+            Admission a2 = new Admission(); a2.setId(2); a2.setPatientID(2);
+
+            mockAdmissions = new Admission[] { a1, a2 };
+
+            Allocation alloc1 = new Allocation(); alloc1.setAdmissionId(1); alloc1.setEmployeeId(101);
+            Allocation alloc2 = new Allocation(); alloc2.setAdmissionId(1); alloc2.setEmployeeId(102);
+            Allocation alloc3 = new Allocation(); alloc3.setAdmissionId(2); alloc3.setEmployeeId(103);
+
+            mockAllocations = new Allocation[] { alloc1, alloc2, alloc3 };
+        }
+
+        @Test
+        void returnsExpected() {
+            when(apiHelper.getAllPatients()).thenReturn(mockPatients);
+            when(apiHelper.getAllAdmissions()).thenReturn(mockAdmissions);
+            when(apiHelper.getAllAllocations()).thenReturn(mockAllocations);
+
+            List<Patient> result = service.getPatientsMultipleStaff();
+
+            assertNotNull(result);
+            assertEquals(1, result.size());
+            assertEquals(1, result.get(0).getId());
+            assertEquals("Viv", result.get(0).getFirstName());
+        }
+
+        @Test
+        void returnsEmptyWhenNoMultiples() {
+            when(apiHelper.getAllPatients()).thenReturn(mockPatients);
+            when(apiHelper.getAllAdmissions()).thenReturn(mockAdmissions);
+
+            mockAllocations = Arrays.copyOfRange(mockAllocations, 0, mockAllocations.length - 1);
+            when(apiHelper.getAllAllocations()).thenReturn(mockAllocations);
+
+            List<Patient> result = service.getPatientsMultipleStaff();
+
+            assertNotNull(result);
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        void handlesErrorsGracefully() {
+            when(apiHelper.getAllPatients()).thenThrow(new RuntimeException("Mock Error"));
+            when(apiHelper.getAllAdmissions()).thenThrow(new RuntimeException("Mock Error"));
+            when(apiHelper.getAllAllocations()).thenThrow(new RuntimeException("Mock Error"));
+
+            List<Patient> result = service.getPatientsReadmittedSevenDays();
+            
+            assertNotNull(result);
             assertTrue(result.isEmpty());
         }
     }

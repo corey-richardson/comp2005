@@ -65,6 +65,7 @@ class AdmissionServiceTest
         void handlesErrorsGracefully() {
             when(apiHelper.getAllAdmissions()).thenThrow(new RuntimeException("Mock Error"));
             String result = service.getMonthWithMostAdmissions();
+            assertNotNull(result);
             assertEquals("No admissions found.", result);
         }
     }
