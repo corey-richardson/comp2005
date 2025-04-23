@@ -133,7 +133,7 @@ class PatientControllerTest
 
         @Test
         void returnsExpected() {
-            when(patientService.getPatientsMultipleStaff()).thenReturn(mockPatients.subList(0, 0));
+            when(patientService.getPatientsMultipleStaff()).thenReturn(mockPatients.subList(0, 1));
             List<Patient> result = patientController.getMultipleStaff();
 
             assertNotNull(result);
