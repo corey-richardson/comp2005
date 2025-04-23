@@ -17,7 +17,6 @@ public class AdmissionController
     // F3 Endpoint
     @GetMapping("/month-with-most")
     public String getMonthWithMost() {
-        // TODO
-        return "";
+        return "NOT IMPLEMENTED";
     }
 }

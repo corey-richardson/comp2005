@@ -184,11 +184,40 @@ class PatientServiceTest
         }
 
         @Test
+        void returnsExpectedDifferentAdmissions() {
+            // Tests that it finds patients with multiple staff across separate admissions
+            // Here, "Heather" (ID:2) has two admissions (IDs:2,3) where each had a different staff member (IDs:103,104)
+            Admission a1 = new Admission(); a1.setId(1); a1.setPatientID(1);
+            Admission a2 = new Admission(); a2.setId(2); a2.setPatientID(2);
+            Admission a3 = new Admission(); a3.setId(3); a3.setPatientID(2);
+
+            mockAdmissions = new Admission[] { a1, a2, a3 };
+
+            Allocation alloc1 = new Allocation(); alloc1.setAdmissionId(1); alloc1.setEmployeeId(101);
+            Allocation alloc2 = new Allocation(); alloc2.setAdmissionId(1); alloc2.setEmployeeId(102);
+            Allocation alloc3 = new Allocation(); alloc3.setAdmissionId(2); alloc3.setEmployeeId(103);
+            Allocation alloc4 = new Allocation(); alloc4.setAdmissionId(3); alloc4.setEmployeeId(104);
+
+            mockAllocations = new Allocation[] { alloc1, alloc2, alloc3, alloc4 };
+
+            when(apiHelper.getAllPatients()).thenReturn(mockPatients);
+            when(apiHelper.getAllAdmissions()).thenReturn(mockAdmissions);
+            when(apiHelper.getAllAllocations()).thenReturn(mockAllocations);
+
+            List<Patient> result = service.getPatientsMultipleStaff();
+
+            assertNotNull(result);
+            assertEquals(2, result.size());
+            assertEquals(2, result.get(1).getId());
+            assertEquals("Heather", result.get(1).getFirstName());
+        }
+
+        @Test
         void returnsEmptyWhenNoMultiples() {
             when(apiHelper.getAllPatients()).thenReturn(mockPatients);
             when(apiHelper.getAllAdmissions()).thenReturn(mockAdmissions);
 
-            mockAllocations = Arrays.copyOfRange(mockAllocations, 0, mockAllocations.length - 1);
+            mockAllocations = Arrays.copyOfRange(mockAllocations, 1, mockAllocations.length);
             when(apiHelper.getAllAllocations()).thenReturn(mockAllocations);
 
             List<Patient> result = service.getPatientsMultipleStaff();

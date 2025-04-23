@@ -35,6 +35,6 @@ public class PatientController
     @GetMapping("/multiple-staff")
     public List<Patient> getMultipleStaff() {
         // TODO
-        return Collections.emptyList();
+        return service.getPatientsMultipleStaff();
     }
 }

@@ -92,7 +92,44 @@ public class PatientService
 
     // F4: A list of patients who have had more than one member of staff.
     public List<Patient> getPatientsMultipleStaff() {
-        // TODO
-        return Collections.emptyList();
+        Patient[] patients = apiHelper.getAllPatients();
+        Admission[] admissions = apiHelper.getAllAdmissions();
+        Allocation[] allocations = apiHelper.getAllAllocations();
+
+        // Link admissionId to patientId
+        // Link patientId to ALL associated employees *UNIQUE*
+        // WHERE COUNT(employees) > 1
+
+        // https://stackoverflow.com/questions/2884068/what-is-the-difference-between-a-map-and-a-dictionary
+        // https://stackoverflow.com/questions/1348199/what-is-the-difference-between-the-hashmap-and-map-objects-in-java
+        Map<Integer, Integer> patientAdmissions = new HashMap<>();
+        for (Admission a : admissions) {
+            patientAdmissions.put(a.getId(), a.getPatientID());
+        }
+
+        Map<Integer, Set<Integer>> patientEmployeeLink = new HashMap<>();
+        // for each allocation
+            // if patientAdmissions contains allocation.admissionId
+                // add employeeId to Set
+        for (Allocation al : allocations) {
+            if (patientAdmissions.containsKey(al.getAdmissionId())) {
+                int patientId = patientAdmissions.get(al.getAdmissionId());
+                // https://www.baeldung.com/java-map-computeifabsent
+                patientEmployeeLink
+                        .computeIfAbsent(patientId, k -> new HashSet<>()) // the mapping function is only called if the
+                                                                          // mapping isn't present
+                        .add(al.getEmployeeId());
+            }
+        }
+
+        List<Patient> patientsWithMultipleStaff = new ArrayList<>();
+        for (Patient p : patients) {
+            Set<Integer> employees = patientEmployeeLink.get(p.getId());
+            if (employees != null && employees.size() > 1) { // Cannot invoke "java.util.Set.size()" because "employees" is null
+                patientsWithMultipleStaff.add(p);
+            }
+        }
+
+        return patientsWithMultipleStaff;
     }
 }
