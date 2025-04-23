@@ -86,14 +86,14 @@ public class PatientService
                 }
             }
 
-            List<Patient> readmitted_patients = new ArrayList<>();
+            List<Patient> readmittedPatients = new ArrayList<>();
             for (Patient patient : patients) {
                 if (readmittedIds.contains(patient.getId())) {
-                    readmitted_patients.add(patient);
+                    readmittedPatients.add(patient);
                 }
             }
 
-            return readmitted_patients;
+            return readmittedPatients;
 
         } catch (Exception e) {
             return Collections.emptyList();
