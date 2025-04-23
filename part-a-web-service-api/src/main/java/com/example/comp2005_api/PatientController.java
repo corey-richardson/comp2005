@@ -34,7 +34,6 @@ public class PatientController
     // F4 Endpoint
     @GetMapping("/multiple-staff")
     public List<Patient> getMultipleStaff() {
-        // TODO
         return service.getPatientsMultipleStaff();
     }
 }

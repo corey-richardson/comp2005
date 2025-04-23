@@ -42,7 +42,6 @@ class AdmissionServiceTest
     }
 
     @Nested
-    @Disabled("Disabled failing tests whilst working on F4")
     class MonthWithMostAdmissionsTests {
 
         @Test
