@@ -118,4 +118,60 @@ class PatientControllerTest
             assertTrue(patients.isEmpty());
         }
     }
+
+    @Nested
+    class MultipleStaffTests {
+        private List<Patient> mockPatients;
+
+        @BeforeEach
+        void setUp() {
+            Patient p1 = new Patient(); p1.setId(1); p1.setFirstName("Viv");
+            Patient p2 = new Patient(); p2.setId(2); p2.setFirstName("Heather");
+
+            mockPatients = Arrays.asList(p1, p2);
+        }
+
+        @Test
+        void returnsExpected() {
+            when(patientService.getPatientsMultipleStaff()).thenReturn(mockPatients.subList(0, 0));
+            List<Patient> result = patientController.getMultipleStaff();
+
+            assertNotNull(result);
+            assertEquals(1, result.size());
+            assertEquals(1, result.get(0).getId());
+            assertEquals("Viv", result.get(0).getFirstName());
+        }
+
+        @Test
+        void returnsExpectedDifferentAdmissions() {
+            when(patientService.getPatientsMultipleStaff()).thenReturn(mockPatients);
+
+            List<Patient> result = patientController.getMultipleStaff();
+
+            assertEquals(2, result.size());
+            assertEquals("Viv", result.get(0).getFirstName());
+            assertEquals("Heather", result.get(1).getFirstName());
+        }
+
+        @Test
+        void returnsEmptyWhenNoMultiples() {
+            when(patientService.getPatientsMultipleStaff()).thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientController.getMultipleStaff();
+
+            assertNotNull(result);
+            assertTrue(result.isEmpty(), "Expected empty list of Patients.");
+        }
+
+        @Test
+        void handleServiceFailure() {
+            /// When the patientService fails, it returns an emptyList
+            when(patientService.getPatientsReadmittedSevenDays()).thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientController.getMultipleStaff();
+
+            assertNotNull(result);
+            assertTrue(result.isEmpty());
+        }
+    }
 }
