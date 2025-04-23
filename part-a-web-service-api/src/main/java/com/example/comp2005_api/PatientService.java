@@ -41,25 +41,28 @@ public class PatientService
             Patient[] patients = apiHelper.getAllPatients();
             Admission[] admissions = apiHelper.getAllAdmissions();
 
+            Map<Integer, List<Admission>> patientAdmissionLink = new HashMap<>();
+            for (Admission a : admissions) {
+                int patientId = a.getPatientID();
+                patientAdmissionLink
+                        .computeIfAbsent(patientId, k -> new ArrayList<>())
+                        .add(a);
+            }
+
             Set<Integer> readmittedIds = new HashSet<>();
-
             for (Patient p : patients) {
-                // Get all admissions for a patient
-                List<Admission> admissionsByPatient = new ArrayList<>();
+                int patientId = p.getId();
+                List<Admission> patientAdmissions = patientAdmissionLink.get(patientId);
 
-                for (Admission a : admissions) {
-                    if (a.getPatientID() == p.getId()) {
-                        admissionsByPatient.add(a);
-                    }
+                if (patientAdmissions == null || patientAdmissions.size() < 2) { // guard
+                    continue;
                 }
-                // Sort by admission date
-                // https://www.w3schools.com/java/ref_arraylist_sort.asp
-                admissionsByPatient.sort(Comparator.comparing(a -> LocalDateTime.parse(a.getAdmissionDate())));
 
-                // Check for readmission within 7 days
-                for (int i = 1; i < admissionsByPatient.size(); i++) {
-                    Admission previous = admissionsByPatient.get(i-1);
-                    Admission current = admissionsByPatient.get(i);
+                patientAdmissions.sort(Comparator.comparing(a -> LocalDateTime.parse(a.getAdmissionDate())));
+
+                for (int i = 1; i < patientAdmissions.size(); i++) {
+                    Admission previous = patientAdmissions.get(i - 1);
+                    Admission current = patientAdmissions.get(i);
 
                     if (previous.getDischargeDate() != null) {
                         LocalDateTime discharge = LocalDateTime.parse(previous.getDischargeDate());
@@ -85,6 +88,7 @@ public class PatientService
             }
 
             return readmitted_patients;
+
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -92,44 +96,48 @@ public class PatientService
 
     // F4: A list of patients who have had more than one member of staff.
     public List<Patient> getPatientsMultipleStaff() {
-        Patient[] patients = apiHelper.getAllPatients();
-        Admission[] admissions = apiHelper.getAllAdmissions();
-        Allocation[] allocations = apiHelper.getAllAllocations();
+        try {
+            Patient[] patients = apiHelper.getAllPatients();
+            Admission[] admissions = apiHelper.getAllAdmissions();
+            Allocation[] allocations = apiHelper.getAllAllocations();
 
-        // Link admissionId to patientId
-        // Link patientId to ALL associated employees *UNIQUE*
-        // WHERE COUNT(employees) > 1
+            // Link admissionId to patientId
+            // Link patientId to ALL associated employees *UNIQUE*
+            // WHERE COUNT(employees) > 1
 
-        // https://stackoverflow.com/questions/2884068/what-is-the-difference-between-a-map-and-a-dictionary
-        // https://stackoverflow.com/questions/1348199/what-is-the-difference-between-the-hashmap-and-map-objects-in-java
-        Map<Integer, Integer> patientAdmissions = new HashMap<>();
-        for (Admission a : admissions) {
-            patientAdmissions.put(a.getId(), a.getPatientID());
-        }
+            // https://stackoverflow.com/questions/2884068/what-is-the-difference-between-a-map-and-a-dictionary
+            // https://stackoverflow.com/questions/1348199/what-is-the-difference-between-the-hashmap-and-map-objects-in-java
+            Map<Integer, Integer> patientAdmissions = new HashMap<>();
+            for (Admission a : admissions) {
+                patientAdmissions.put(a.getId(), a.getPatientID());
+            }
 
-        Map<Integer, Set<Integer>> patientEmployeeLink = new HashMap<>();
-        // for each allocation
+            Map<Integer, Set<Integer>> patientEmployeeLink = new HashMap<>();
+            // for each allocation
             // if patientAdmissions contains allocation.admissionId
-                // add employeeId to Set
-        for (Allocation al : allocations) {
-            if (patientAdmissions.containsKey(al.getAdmissionId())) {
-                int patientId = patientAdmissions.get(al.getAdmissionId());
-                // https://www.baeldung.com/java-map-computeifabsent
-                patientEmployeeLink
-                        .computeIfAbsent(patientId, k -> new HashSet<>()) // the mapping function is only called if the
-                                                                          // mapping isn't present
-                        .add(al.getEmployeeId());
+            // add employeeId to Set
+            for (Allocation al : allocations) {
+                if (patientAdmissions.containsKey(al.getAdmissionId())) {
+                    int patientId = patientAdmissions.get(al.getAdmissionId());
+                    // https://www.baeldung.com/java-map-computeifabsent
+                    patientEmployeeLink
+                            .computeIfAbsent(patientId, k -> new HashSet<>()) // the mapping function is only called if the
+                            // mapping isn't present
+                            .add(al.getEmployeeId());
+                }
             }
-        }
 
-        List<Patient> patientsWithMultipleStaff = new ArrayList<>();
-        for (Patient p : patients) {
-            Set<Integer> employees = patientEmployeeLink.get(p.getId());
-            if (employees != null && employees.size() > 1) { // Cannot invoke "java.util.Set.size()" because "employees" is null
-                patientsWithMultipleStaff.add(p);
+            List<Patient> patientsWithMultipleStaff = new ArrayList<>();
+            for (Patient p : patients) {
+                Set<Integer> employees = patientEmployeeLink.get(p.getId());
+                if (employees != null && employees.size() > 1) { // Cannot invoke "java.util.Set.size()" because "employees" is null
+                    patientsWithMultipleStaff.add(p);
+                }
             }
-        }
 
-        return patientsWithMultipleStaff;
+            return patientsWithMultipleStaff;
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 }
