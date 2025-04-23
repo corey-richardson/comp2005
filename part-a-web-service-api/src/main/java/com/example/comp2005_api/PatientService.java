@@ -22,13 +22,19 @@ public class PatientService
             Patient[] patients = apiHelper.getAllPatients();
             Admission[] admissions = apiHelper.getAllAdmissions();
 
-            Set<Integer> admittedIds = Arrays.stream(admissions)
-                    .map(Admission::getPatientID)
-                    .collect(Collectors.toSet());
+            Set<Integer> admittedPatientIds = new HashSet<>();
+            for (Admission a : admissions) {
+                admittedPatientIds.add(a.getPatientID());
+            }
 
-            return Arrays.stream(patients)
-                    .filter(p -> !admittedIds.contains(p.getId()))
-                    .collect(Collectors.toList());
+            List<Patient> neverAdmittedPatients = new ArrayList<>();
+            for (Patient p : patients) {
+                if (!admittedPatientIds.contains(p.getId())) {
+                    neverAdmittedPatients.add(p);
+                }
+            }
+
+            return neverAdmittedPatients;
         } catch (Exception e) {
             // Handle gracefully
             return Collections.emptyList();
