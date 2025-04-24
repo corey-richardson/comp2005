@@ -4,12 +4,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class AdmissionService
 {
     private final ApiHelper apiHelper;
+    // https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
 
     public AdmissionService(ApiHelper apiHelper) {
         this.apiHelper = apiHelper;
@@ -19,7 +22,6 @@ public class AdmissionService
     public String getMonthWithMostAdmissions() {
         try {
             Admission[] admissions = apiHelper.getAllAdmissions();
-
             Map<String, Integer> admissionsByMonth = new HashMap<>(); // "YYYY-MM"
 
             for (Admission admission : admissions) {
@@ -34,8 +36,6 @@ public class AdmissionService
                     continue;
                 }
 
-                // https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
                 String yearMonthKey = admissionDate.format(formatter);
 
                 int count = admissionsByMonth.getOrDefault(yearMonthKey, 0);
@@ -52,8 +52,8 @@ public class AdmissionService
                 }
             }
 
-            if (mostCommonMonth == null) { return "No admissions found."; }
-            return mostCommonMonth;
+            return mostCommonMonth != null ? mostCommonMonth : "No admissions found.";
+
         } catch (Exception e) {
             return "No admissions found.";
         }
