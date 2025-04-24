@@ -43,7 +43,7 @@ public class AdmissionService
             }
 
             int maxCount = -1;
-            String mostCommonMonth = "";
+            String mostCommonMonth = null;
             // https://stackoverflow.com/questions/46898/how-do-i-efficiently-iterate-over-each-entry-in-a-java-map
             for (Map.Entry<String, Integer> entry : admissionsByMonth.entrySet()) {
                 if (entry.getValue() > maxCount) {
