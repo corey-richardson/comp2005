@@ -30,13 +30,13 @@ public class AdmissionService
                 try {
                     admissionDate = LocalDateTime.parse(admissionDateStr);
                 } catch (Exception e) {
-                    // Failed to parse date, skip to next date
+                    // Failed to parse date, skip to next
                     continue;
                 }
 
                 // https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-                String yearMonthKey = String.valueOf(LocalDateTime.parse(admissionDateStr, formatter));
+                String yearMonthKey = admissionDate.format(formatter);
 
                 int count = admissionsByMonth.getOrDefault(yearMonthKey, 0);
                 admissionsByMonth.put(yearMonthKey, count+1);
