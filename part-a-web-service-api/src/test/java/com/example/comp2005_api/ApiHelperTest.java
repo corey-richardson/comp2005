@@ -86,10 +86,12 @@ class ApiHelperTest
         @BeforeEach
         void setUp() {
             Allocation alloc1 = new Allocation();
+            alloc1.setId(1);
             alloc1.setAdmissionId(1);
             alloc1.setEmployeeId(101);
 
             Allocation alloc2 = new Allocation();
+            alloc2.setId(2);
             alloc2.setAdmissionId(1);
             alloc2.setEmployeeId(102);
 
@@ -97,7 +99,36 @@ class ApiHelperTest
             mockAllocation = alloc1;
         }
 
-        // TODO
+        @Test
+        void getAllAllocations_returnsAllocations() {
+            // Arrange
+            when(restTemplate.getForObject("https://web.socem.plymouth.ac.uk/COMP2005/api/Allocations", Allocation[].class))
+                    .thenReturn(mockAllocations);
+            // Act
+            Allocation[] allocations = apiHelper.getAllAllocations();
+            // Assert
+            assertNotNull(allocations);
+            assertEquals(2, allocations.length);
+            assertEquals(1, allocations[0].getId());
+            assertEquals(101, allocations[0].getEmployeeId());
+        }
+
+        @Test
+        void getAllocationById_returnsAllocation() {
+            when(restTemplate.getForObject("https://web.socem.plymouth.ac.uk/COMP2005/api/Allocations/1", Allocation.class))
+                    .thenReturn(mockAllocation);
+            Allocation allocation = apiHelper.getAllocationById(1);
+            assertNotNull(allocation);
+            assertEquals(1, allocation.getId());
+        }
+
+        @Test
+        void getAllocationById_handles404() {
+            when(restTemplate.getForObject("https://web.socem.plymouth.ac.uk/COMP2005/api/Allocations/999", Allocation.class))
+                    .thenThrow(new org.springframework.web.client.HttpClientErrorException(HttpStatus.NOT_FOUND));
+            Allocation allocation = apiHelper.getAllocationById(999);
+            assertNull(allocation, "Allocation should be null when the ID does not exist.");
+        }
     }
 
     @Nested
