@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,6 +32,23 @@ class ApiHelperTest
     private Allocation[] mockAllocations;
     private Employee[] mockEmployees;
     private Patient[] mockPatients;
+
+    @Nested
+    class HandleRequestTests {
+
+        // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/HttpClientErrorException.html
+        @Test
+        void propagateExceptionWhenNot404Error() {
+            when(restTemplate.getForObject("https://web.socem.plymouth.ac.uk/COMP2005/api/Patients/1", Patient.class))
+                    .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+
+            HttpClientErrorException e = assertThrows(HttpClientErrorException.class,
+                    () -> apiHelper.getPatientById(1)
+            );
+
+            assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
+        }
+    }
 
     @Nested
     class AdmissionTests {
@@ -148,7 +166,36 @@ class ApiHelperTest
             mockEmployee = e1;
         }
 
-        // TODO
+        @Test
+        void getAllEmployees_returnsEmployees() {
+            // Arrange
+            when(restTemplate.getForObject("https://web.socem.plymouth.ac.uk/COMP2005/api/Employees", Employee[].class))
+                    .thenReturn(mockEmployees);
+            // Act
+            Employee[] employees = apiHelper.getAllEmployees();
+            // Assert
+            assertNotNull(employees);
+            assertEquals(2, employees.length);
+            assertEquals(101, employees[0].getId());
+            assertEquals("Mike", employees[0].getFirstName());
+        }
+
+        @Test
+        void getEmployeeById_returnsEmployee() {
+            when(restTemplate.getForObject("https://web.socem.plymouth.ac.uk/COMP2005/api/Employees/1", Employee.class))
+                    .thenReturn(mockEmployee);
+            Employee employee = apiHelper.getEmployeeById(1);
+            assertNotNull(employee);
+            assertEquals(101, employee.getId());
+        }
+
+        @Test
+        void getAllocationById_handles404() {
+            when(restTemplate.getForObject("https://web.socem.plymouth.ac.uk/COMP2005/api/Employees/999", Employee.class))
+                    .thenThrow(new org.springframework.web.client.HttpClientErrorException(HttpStatus.NOT_FOUND));
+            Employee employee = apiHelper.getEmployeeById(999);
+            assertNull(employee, "Employee should be null when the ID does not exist.");
+        }
     }
 
     @Nested
