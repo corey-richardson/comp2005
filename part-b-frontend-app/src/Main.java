@@ -99,6 +99,25 @@ public class Main
     }
 
 
+    private static void fetchMockData(DefaultTableModel tableModel) {
+        List<PatientModel> mockPatients = List.of(
+                new PatientModel(1, "1234567890", "Corey", "Richardson"),
+                new PatientModel(2, "0987654321", "Kelly", "Margot"),
+                new PatientModel(3, "1122334455", "Daryl", "Matthews"),
+                new PatientModel(3, "1243152453", "Trevor", "Locke"),
+                new PatientModel(3, "0982359823", "Cheryl", "McDonald"),
+                new PatientModel(3, "3259874359", "Parker", "Fewings"),
+                new PatientModel(3, "2455215933", "Maria", "King"),
+                new PatientModel(3, "9183276522", "Leah", "Simpson"),
+                new PatientModel(3, "0439683871", "Anna", "Johnson")
+        );
+
+        SwingUtilities.invokeLater(() -> {
+            displayPatients(mockPatients, tableModel);
+        });
+    }
+
+    
     private static List<PatientModel> parsePatients(String jsonResponse) {
         Gson gson = new Gson();
         Type patientListType = new TypeToken<List<PatientModel>>() {}.getType();
