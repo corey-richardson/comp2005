@@ -2,6 +2,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -12,6 +16,10 @@ import java.util.List;
 
 public class Main
 {
+    private static final double RATIO = 1.618; // Golden Ratio
+    private static final int WIDTH = 400;
+    private static final int HEIGHT = (int) (WIDTH * RATIO);
+
     public static void main(String[] args)
     {
         SwingUtilities.invokeLater(Main::gui);
@@ -21,20 +29,48 @@ public class Main
     private static void gui() {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 600);
+        frame.setSize(WIDTH, HEIGHT);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         JButton fetchButton = new JButton("Fetch Patients Readmitted Within 7 Days");
-        JTextArea resultSection = new JTextArea();
-        resultSection.setEditable(false);
+
+        String[] columns = {"Patient ID", "NHS Number", "Forename", "Surname"};
+        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+        JTable resultsTable = new JTable(tableModel);
+
+        // Alternating lines of White - Light Gray
+        resultsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table,
+                                                           Object value,
+                                                           boolean isSelected,
+                                                           boolean hasFocus,
+                                                           int row,
+                                                           int column) {
+
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+                if (!isSelected) {
+                    if (row % 2 == 0) {
+                        c.setBackground(Color.WHITE);
+                    } else {
+                        c.setBackground(new Color(240, 240, 240));
+                    }
+                }
+                return c;
+            }
+        });
 
         panel.add(fetchButton, BorderLayout.NORTH);
-        panel.add(new JScrollPane(resultSection), BorderLayout.CENTER);
+        panel.add(new JScrollPane(resultsTable), BorderLayout.CENTER);
 
         fetchButton.addActionListener(e -> {
-            fetchData(resultSection);
+            // fetchData(tableModel);
+            fetchMockData(tableModel);
+            resultsTable.setVisible(true);
         });
 
         frame.add(panel);
@@ -42,7 +78,7 @@ public class Main
     }
 
 
-    private static void fetchData(JTextArea resultsSection) {
+    private static void fetchData(DefaultTableModel tableModel) {
         // https://openjdk.org/groups/net/httpclient/intro.html
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -54,13 +90,10 @@ public class Main
                 .thenAccept(body -> {
                    List<PatientModel> patients = parsePatients(body) ;
                    SwingUtilities.invokeLater(() -> {
-                       displayPatients(patients, resultsSection);
+                       displayPatients(patients, tableModel);
                    });
                 })
                 .exceptionally(e -> {
-                    SwingUtilities.invokeLater(() -> {
-                        resultsSection.setText("Error fetching patient data.");
-                    });
                     return null;
                 });
     }
@@ -73,24 +106,17 @@ public class Main
     }
 
 
-    private static void displayPatients(List<PatientModel> patients, JTextArea resultsSection) {
-        if (patients == null || patients.isEmpty()) {
-            resultsSection.setText("No patients readmitted within 7 days have been found.");
-            return;
-        }
+    private static void displayPatients(List<PatientModel> patients, DefaultTableModel tableModel) {
+        tableModel.setRowCount(0);
 
-        // https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html
-        StringBuilder sb = new StringBuilder();
         for (PatientModel patient : patients) {
-            sb.append("ID: ")
-                    .append(patient.getId())
-                    .append(" - ")
-                    .append(patient.getFullName())
-                    .append(" : ")
-                    .append(patient.getNhsNumber())
-                    .append("\n");
+            Object[] rowData = {
+                    patient.getId(),
+                    patient.getNhsNumber(),
+                    patient.getForename(),
+                    patient.getSurname()
+            };
+            tableModel.addRow(rowData);
         }
-
-        resultsSection.setText(sb.toString());
     }
 }
