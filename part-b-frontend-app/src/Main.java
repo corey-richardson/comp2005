@@ -117,7 +117,7 @@ public class Main
         });
     }
 
-    
+
     private static List<PatientModel> parsePatients(String jsonResponse) {
         Gson gson = new Gson();
         Type patientListType = new TypeToken<List<PatientModel>>() {}.getType();
