@@ -90,7 +90,6 @@ class PatientServiceTest
     @Nested
     class ReadmittedWithinSevenDaysTests {
         private Admission[] mockAdmissions;
-        private Admission[] mockAdmissionsOnlyGT7Days;
 
 
         @BeforeEach
@@ -114,7 +113,6 @@ class PatientServiceTest
             a4.setAdmissionDate("2023-01-20T17:38:00");
 
             mockAdmissions = new Admission[] { a1, a2, a3, a4 };
-            mockAdmissionsOnlyGT7Days = new Admission[] { a3, a4 };
         }
 
         @Test
