@@ -166,7 +166,7 @@ class PatientControllerTest
         @Test
         void handleServiceFailure() {
             /// When the patientService fails, it returns an emptyList
-            when(patientService.getPatientsReadmittedSevenDays()).thenReturn(Collections.emptyList());
+            when(patientService.getPatientsMultipleStaff()).thenReturn(Collections.emptyList());
 
             List<Patient> result = patientController.getMultipleStaff();
 
