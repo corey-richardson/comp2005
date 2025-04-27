@@ -128,6 +128,38 @@ class PatientServiceTest
         }
 
         @Test
+        void testBoundaryBehaviour() {
+            // Arrange
+            Patient patientOne = new Patient(1, "LESS", "THAN", "06235959");
+            Patient patientTwo = new Patient(2, "EXACTLY", "SEVEN", "07000000");
+            Patient patientThree = new Patient(3, "MORE", "THAN", "07000001");
+
+            Admission firstAdmission_patientOne = new Admission(1, 1, "2024-12-31T00:00:00", "2025-01-01T00:00:00");
+            Admission firstAdmission_patientTwo = new Admission(2, 2, "2024-12-31T00:00:00", "2025-01-01T00:00:00");
+            Admission firstAdmission_patientThree = new Admission(3, 3, "2024-12-31T00:00:00", "2025-01-01T00:00:00");
+
+            Admission readmitWithinSevenDays = new Admission(4, 1, "2025-01-07T23:59:59", null);  // < 7 days, INCLUDE
+            Admission readmitExactlySevenDays = new Admission(5, 2, "2025-01-08T00:00:00", null); // = 7 days, INCLUDE
+            Admission readmitAfterSevenDays = new Admission(6, 3, "2025-01-08T00:00:01", null);   // > 7 days, EXCLUDE
+
+            mockPatients = new Patient[] { patientOne, patientTwo, patientThree };
+            mockAdmissions = new Admission[] { firstAdmission_patientOne, firstAdmission_patientTwo, firstAdmission_patientThree, readmitWithinSevenDays, readmitExactlySevenDays, readmitAfterSevenDays };
+
+            when(apiHelper.getAllPatients()).thenReturn(mockPatients);
+            when(apiHelper.getAllAdmissions()).thenReturn(mockAdmissions);
+
+            // Act
+            List<Patient> patients = service.getPatientsReadmittedSevenDays();
+
+            // Assert
+            assertNotNull(patients);
+            assertEquals(2, patients.size());
+            assertEquals(1, patients.get(0).getId());
+            assertEquals(2, patients.get(1).getId());
+
+        }
+
+        @Test
         void returnsEmptyWhenNoPatients() {
             mockAdmissions = Arrays.copyOfRange(mockAdmissions, 2, mockAdmissions.length); // a3 and a4 only, >7 days
             when(apiHelper.getAllPatients()).thenReturn(mockPatients);
