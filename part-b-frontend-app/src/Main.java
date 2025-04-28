@@ -80,8 +80,8 @@ public class Main
         });
 
         // Font sizes
-        Font titleFont = new Font(null, Font.BOLD, 16);
-        Font largerFont = new Font(null, Font.PLAIN, 14);
+        Font titleFont = new Font(null, Font.BOLD, 20);
+        Font largerFont = new Font(null, Font.PLAIN, 16);
         titleLabel.setFont(titleFont);
         fetchButton.setFont(largerFont);
         resultsTable.setFont(largerFont);
@@ -92,8 +92,8 @@ public class Main
         contentPanel.add(new JScrollPane(resultsTable), BorderLayout.CENTER);
 
         fetchButton.addActionListener(e -> {
-            // fetchData(tableModel);
-            fetchMockData(tableModel);
+            fetchData(tableModel);
+            // fetchMockData(tableModel);
             resultsTable.setVisible(true);
         });
 
@@ -111,7 +111,14 @@ public class Main
                 .build();
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
+                .thenApply(response -> {
+                    if (response.statusCode() != 200) {
+                        System.out.println(response.body());
+                        throw new RuntimeException("HTTP Error: " + response.statusCode());
+                    }
+
+                    return response.body();
+                })
                 .thenAccept(body -> {
                    List<PatientModel> patients = parsePatients(body) ;
                    SwingUtilities.invokeLater(() -> {
@@ -119,6 +126,10 @@ public class Main
                    });
                 })
                 .exceptionally(e -> {
+                    // https://stackoverflow.com/questions/6270354/how-to-open-warning-information-error-dialog-in-swing
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(null, "Failed to fetch or parse data from the API, or there is no data to fetch. Confirm that the API is running!");
+                    });
                     return null;
                 });
     }
@@ -144,6 +155,8 @@ public class Main
 
 
     private static List<PatientModel> parsePatients(String jsonResponse) {
+        // throw new RuntimeException("Mock parsing failure"); // Used to test Error Message Dialog
+
         Gson gson = new Gson();
         Type patientListType = new TypeToken<List<PatientModel>>() {}.getType();
         return gson.fromJson(jsonResponse, patientListType);
