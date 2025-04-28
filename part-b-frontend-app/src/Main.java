@@ -17,7 +17,7 @@ import java.util.List;
 public class Main
 {
     private static final double RATIO = 1.618; // Golden Ratio
-    private static final int WIDTH = 400;
+    private static final int WIDTH = 600;
     private static final int HEIGHT = (int) (WIDTH * RATIO);
 
     public static void main(String[] args)
@@ -31,9 +31,17 @@ public class Main
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(WIDTH, HEIGHT);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BorderLayout());
+        titlePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        frame.setTitle("Maternity Readmissions");
+        JLabel titleLabel = new JLabel("Maternity Ward Patients Readmitted Within 7 Days");
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         JButton fetchButton = new JButton("Fetch Patients Readmitted Within 7 Days");
 
@@ -64,8 +72,17 @@ public class Main
             }
         });
 
-        panel.add(fetchButton, BorderLayout.NORTH);
-        panel.add(new JScrollPane(resultsTable), BorderLayout.CENTER);
+        // Font sizes
+        Font titleFont = new Font(null, Font.BOLD, 16);
+        Font largerFont = new Font(null, Font.PLAIN, 14);
+        titleLabel.setFont(titleFont);
+        fetchButton.setFont(largerFont);
+        resultsTable.setFont(largerFont);
+        resultsTable.getTableHeader().setFont(largerFont);
+
+        titlePanel.add(titleLabel, BorderLayout.NORTH);
+        contentPanel.add(fetchButton, BorderLayout.NORTH);
+        contentPanel.add(new JScrollPane(resultsTable), BorderLayout.CENTER);
 
         fetchButton.addActionListener(e -> {
             // fetchData(tableModel);
@@ -73,7 +90,8 @@ public class Main
             resultsTable.setVisible(true);
         });
 
-        frame.add(panel);
+        frame.add(titlePanel, BorderLayout.NORTH);
+        frame.add(contentPanel, BorderLayout.CENTER);
         frame.setVisible(true);
     }
 
