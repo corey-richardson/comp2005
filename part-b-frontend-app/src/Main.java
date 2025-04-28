@@ -46,7 +46,14 @@ public class Main
         JButton fetchButton = new JButton("Fetch Patients Readmitted Within 7 Days");
 
         String[] columns = {"Patient ID", "NHS Number", "Forename", "Surname"};
-        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+
+        // https://stackoverflow.com/questions/24726896/how-to-make-cells-of-jtable-non-editable-but-selectable
+        DefaultTableModel tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         JTable resultsTable = new JTable(tableModel);
 
         // Alternating lines of White - Light Gray
