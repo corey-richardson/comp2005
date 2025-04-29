@@ -10,3 +10,9 @@ This is the template for your COMP2005 Assessment. It uses a single repo for bot
 Refer to the brief document for details regarding what is required in each of these.
 
 Each folder also contains a `.gitignore file`, which should prevent unnecessary (temporary) files being committed (specific to Java, which is required).
+
+---
+
+> Add UT/IT tables to Appendix
+> Have a couple tests in detail in main report section
+> What lines do what? Relate to theory. AAA and YAML
